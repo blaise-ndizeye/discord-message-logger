@@ -1,0 +1,90 @@
+version: '3.8'
+
+secrets:
+  discord_bot_token:
+    file: ./secrets/discord_bot_token.txt
+  mongodb_password:
+    file: ./secrets/mongodb_password.txt
+  mongodb_username:
+    file: ./secrets/mongodb_username.txt
+
+services:
+  # MongoDB database
+  mongodb:
+    image: mongo:6.0-jammy
+    container_name: discord-logger-mongodb-prod
+    restart: unless-stopped
+    ports:
+      - "${MONGODB_PORT:-27017}:27017"
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME_FILE=/run/secrets/mongodb_username
+      - MONGO_INITDB_ROOT_PASSWORD_FILE=/run/secrets/mongodb_password
+      - MONGO_INITDB_DATABASE=${MONGODB_DATABASE:-discord-messages}
+    secrets:
+      - mongodb_username
+      - mongodb_password
+    volumes:
+      - mongodb_data_prod:/data/db
+      - ./docker/mongo-init.js:/docker-entrypoint-initdb.d/mongo-init.js:ro
+    networks:
+      - discord-logger-network-prod
+    healthcheck:
+      test: echo 'db.runCommand("ping").ok' | mongosh localhost:27017/${MONGODB_DATABASE:-discord-messages} --quiet
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+  # Discord Message Logger Application
+  discord-logger:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: discord-message-logger:${VERSION:-latest}
+    container_name: discord-logger-app-prod
+    restart: unless-stopped
+    ports:
+      - "${APP_PORT:-8080}:8080"
+    environment:
+      - DISCORD_BOT_TOKEN_FILE=/run/secrets/discord_bot_token
+      - MONGODB_URI_TEMPLATE=mongodb://MONGODB_USERNAME:MONGODB_PASSWORD@mongodb:27017/${MONGODB_DATABASE:-discord-messages}?authSource=admin
+      - MONGODB_USERNAME_FILE=/run/secrets/mongodb_username
+      - MONGODB_PASSWORD_FILE=/run/secrets/mongodb_password
+      - SERVER_PORT=8080
+      - SPRING_PROFILES_ACTIVE=prod
+      - JAVA_OPTS=${JAVA_OPTS:--Xmx1g -Xms512m -XX:+UseG1GC -XX:+UseContainerSupport}
+    secrets:
+      - discord_bot_token
+      - mongodb_username
+      - mongodb_password
+    depends_on:
+      mongodb:
+        condition: service_healthy
+    networks:
+      - discord-logger-network-prod
+    volumes:
+      - ./logs:/app/logs
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/api/messages/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 60s
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+volumes:
+  mongodb_data_prod:
+    driver: local
+
+networks:
+  discord-logger-network-prod:
+    driver: bridge
