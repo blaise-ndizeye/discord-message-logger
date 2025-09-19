@@ -22,6 +22,15 @@
 - 🔒 **Production Ready**: Includes security best practices and secrets management
 - 📈 **Scalable Architecture**: Built with Spring Boot and MongoDB for high performance
 
+## Tech Stark
+- **Backend**: Kotlin + Spring Boot 3.4.0 
+- **Database**: MongoDB 7 with optimized indexes 
+- **Discord**: JDA (Java Discord API) 5.0.0
+- **Containerization**: Docker & Docker Compose V2 
+- **Database Management**: Mongo Express (optional) 
+- **Testing**: JUnit 5 + MockK 
+- **Architecture**: MVC pattern with service layer
+
 ## Quick Start
 
 ### Prerequisites
