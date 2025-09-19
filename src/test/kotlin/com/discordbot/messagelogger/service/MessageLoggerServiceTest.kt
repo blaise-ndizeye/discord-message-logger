@@ -4,10 +4,9 @@ import com.discordbot.messagelogger.model.DiscordMessage
 import com.discordbot.messagelogger.repository.DiscordMessageRepository
 import io.mockk.*
 import net.dv8tion.jda.api.entities.*
-import net.dv8tion.jda.api.entities.channel.concrete.TextChannel
+import net.dv8tion.jda.api.entities.channel.unions.MessageChannelUnion
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
-import org.junit.jupiter.api.assertThrows
 import org.springframework.data.domain.PageImpl
 import org.springframework.data.domain.PageRequest
 import java.time.LocalDateTime
@@ -26,7 +25,7 @@ class MessageLoggerServiceTest {
 
     private lateinit var mockMessage: Message
     private lateinit var mockUser: User
-    private lateinit var mockChannel: TextChannel
+    private lateinit var mockChannel: MessageChannelUnion
     private lateinit var mockGuild: Guild
 
     @BeforeEach
@@ -128,7 +127,7 @@ class MessageLoggerServiceTest {
             guildName = "Test Guild",
             authorId = "123456789",
             authorName = "TestUser",
-            authorDiscriminator = "0001",
+            authorDisplayName = "0001",
             content = "Old content",
             timestamp = LocalDateTime.now(),
             isBot = false

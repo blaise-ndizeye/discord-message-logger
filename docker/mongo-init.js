@@ -47,5 +47,5 @@ db.messages.createIndex({ 'channelId': 1, 'timestamp': -1 });
 db.messages.createIndex({ 'authorId': 1, 'timestamp': -1 });
 db.messages.createIndex({ 'guildId': 1, 'timestamp': -1 });
 
-print('MongoDB initialization completed for discord-messages database');
-print('Created messages collection with validation and indexes');
+console.log('MongoDB initialization completed for discord-messages database');
+console.log('Created messages collection with validation and indexes');

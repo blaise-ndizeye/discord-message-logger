@@ -3,6 +3,7 @@ plugins {
 	id 'org.jetbrains.kotlin.plugin.spring' version '1.9.25'
 	id 'org.springframework.boot' version '3.4.0'
 	id 'io.spring.dependency-management' version '1.1.6'
+	id 'com.github.spotbugs' version '5.2.5'
 }
 
 group = 'com.discordbot'
@@ -11,7 +12,7 @@ description = 'Discord bot that logs messages to MongoDB'
 
 java {
 	toolchain {
-		languageVersion = JavaLanguageVersion.of(17)
+		languageVersion = JavaLanguageVersion.of(21)
 	}
 }
 
@@ -30,10 +31,12 @@ dependencies {
 	// Discord JDA
 	implementation 'net.dv8tion:JDA:5.0.0-beta.24'
 	
+	
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
 	testImplementation 'org.jetbrains.kotlin:kotlin-test-junit5'
 	testImplementation 'io.mockk:mockk:1.13.8'
 	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8"
 }
 
 kotlin {
@@ -44,4 +47,34 @@ kotlin {
 
 tasks.named('test') {
 	useJUnitPlatform()
+}
+
+// Static Analysis Configuration
+
+spotbugs {
+	ignoreFailures = false
+	showStackTraces = true
+	showProgress = true
+	reportLevel = 'medium'
+	effort = 'max'
+	visitors = ['FindSqlInjection', 'SwitchFallthrough']
+	omitVisitors = ['FindNonShortCircuit']
+	excludeFilter = file("$rootProject.projectDir/config/spotbugs/excludeFilter.xml")
+}
+
+spotbugsMain {
+	reports {
+		html {
+			required = true
+			outputLocation = layout.buildDirectory.file("reports/spotbugs/main/spotbugs.html")
+			stylesheet = 'fancy-hist.xsl'
+		}
+	}
+}
+
+// Add quality check task
+tasks.register('qualityCheck') {
+	dependsOn 'test', 'spotbugsMain' // All tests pass + SpotBugs analysis
+	description = 'Runs all quality checks including static analysis and tests'
+	group = 'verification'
 }

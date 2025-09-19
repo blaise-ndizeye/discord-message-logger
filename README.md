@@ -1,6 +1,15 @@
 # Discord Message Logger
 
-A comprehensive Discord bot that logs all messages in channels and stores them in MongoDB database, providing both Discord slash commands and REST API endpoints for querying the data.
+> A discord bot that logs all messages in channels and stores them in MongoDB database, providing both Discord slash commands and REST API endpoints for querying the data.
+
+![Kotlin](https://img.shields.io/badge/Kotlin-7F52FF?style=for-the-badge&logo=kotlin&logoColor=white)
+![Spring Boot](https://img.shields.io/badge/Spring%20Boot-6DB33F?style=for-the-badge&logo=springboot&logoColor=white)
+![MongoDB](https://img.shields.io/badge/MongoDB-47A248?style=for-the-badge&logo=mongodb&logoColor=white)
+![JDA](https://img.shields.io/badge/JDA-5865F2?style=for-the-badge&logo=discord&logoColor=white)
+![Docker](https://img.shields.io/badge/Docker-2496ED?style=for-the-badge&logo=docker&logoColor=white)
+![JUnit5](https://img.shields.io/badge/JUnit5-25A162?style=for-the-badge&logo=junit5&logoColor=white)
+![MockK](https://img.shields.io/badge/MockK-FF6F61?style=for-the-badge&logo=kotlin&logoColor=white)
+![License: MIT](https://img.shields.io/badge/License-MIT-yellow?style=for-the-badge)
 
 ## Features
 
@@ -13,33 +22,32 @@ A comprehensive Discord bot that logs all messages in channels and stores them i
 - 🔒 **Production Ready**: Includes security best practices and secrets management
 - 📈 **Scalable Architecture**: Built with Spring Boot and MongoDB for high performance
 
-## Tech Stack
-
-- **Backend**: Kotlin + Spring Boot 3.4.0
-- **Database**: MongoDB with optimized indexes
-- **Discord**: JDA (Java Discord API) 5.0.0
-- **Containerization**: Docker & Docker Compose
-- **Testing**: JUnit 5 + MockK
-- **Architecture**: MVC pattern with service layer
-
 ## Quick Start
 
 ### Prerequisites
 
-- Java 17+
-- Docker & Docker Compose
+- Java 21
+- Docker & Docker Compose V2
 - Discord Bot Token
 
 ### 1. Setup Discord Bot
 
-1. Go to [Discord Developer Portal](https://discord.com/developers/applications)
-2. Create a new application and bot
-3. Copy the bot token
-4. Enable these bot permissions:
-   - Read Messages/View Channels
-   - Send Messages
-   - Use Slash Commands
-   - Read Message History
+1. Go to the [Discord Developer Portal](https://discord.com/developers/applications).
+2. Click **New Application** → give your bot a name (e.g. `LoggerBot`).
+3. In the sidebar, go to **Bot** → click **Add Bot**.
+4. Under **Token**, click **Reset Token** → copy the token.
+   - ⚠️ Treat this like a password, never commit it to Git.
+5. Enable **Privileged Gateway Intents** (required to read messages):
+   - **MESSAGE CONTENT INTENT**
+   - **SERVER MEMBERS INTENT**
+6. Go to **OAuth2 → URL Generator**:
+   - Under **Scopes**, check `bot` and `applications.commands`.
+   - Under **Bot Permissions**, enable:
+      - Read Messages/View Channels
+      - Read Message History
+      - Send Messages
+      - Use Slash Commands
+   - Copy the generated URL and open it in a browser. Select the server to invite your bot.
 
 ### 2. Environment Configuration
 
@@ -56,24 +64,57 @@ DISCORD_BOT_TOKEN=your-discord-bot-token-here
 MONGODB_PASSWORD=your-secure-password
 ```
 
+⚠️ **Important**: Avoid special characters like `@`, `:`, or `/` in MongoDB passwords as they can cause connection string parsing issues. Use alphanumeric characters and underscores instead.
+
 ### 3. Run with Docker
 
 ```bash
-# Start all services
-docker-compose up -d
+# Start core services (MongoDB + Discord Logger)
+docker compose up -d
+
+# Start with optional services (includes Mongo Express for database management)
+docker compose --profile tools up -d
 
 # View logs
-docker-compose logs -f discord-logger
+docker compose logs -f discord-logger
 
 # Stop services
-docker-compose down
+docker compose down
 ```
 
 ### 4. Invite Bot to Server
 
-Use this URL (replace CLIENT_ID with your bot's client ID):
+Use this URL (replace CLIENT_ID and PERMISSIONS with your bot's client ID):
 ```
-https://discord.com/api/oauth2/authorize?client_id=YOUR_CLIENT_ID&permissions=68608&scope=bot%20applications.commands
+https://discord.com/api/oauth2/authorize?client_id=YOUR_CLIENT_ID&permissions=PERMISSIONS&scope=bot%20applications.commands
+```
+
+## Database Management
+
+### Mongo Express (Optional)
+
+The project includes Mongo Express, a web-based MongoDB admin interface, as an optional service:
+
+```bash
+# Start with Mongo Express enabled
+docker compose --profile tools up -d
+
+# Access Mongo Express at http://localhost:8081
+# Default credentials: admin / admin123
+```
+
+**Features:**
+- Browse and edit database collections
+- Execute MongoDB queries
+- View database statistics
+- Import/export data
+
+**Configuration:**
+Update these variables in your `.env` file:
+```bash
+MONGO_EXPRESS_PORT=8081
+MONGO_EXPRESS_USER=admin
+MONGO_EXPRESS_PASSWORD=your-admin-password
 ```
 
 ## Discord Commands
@@ -181,6 +222,9 @@ spring.data.mongodb.uri=mongodb://localhost:27017/discord-messages
 
 # Build Docker image
 docker build -t discord-message-logger .
+
+# Build and start services
+docker compose up -d --build
 ```
 
 ## Production Deployment
@@ -197,7 +241,7 @@ echo "production-db-password" | docker secret create mongodb_password -
 
 2. **Deploy with production compose**:
 ```bash
-docker-compose -f docker-compose.prod.yml up -d
+docker compose -f docker-compose.prod.yml up -d
 ```
 
 ### Configuration Options
@@ -205,9 +249,16 @@ docker-compose -f docker-compose.prod.yml up -d
 | Environment Variable | Description | Default |
 |---------------------|-------------|---------|
 | `DISCORD_BOT_TOKEN` | Discord bot token | Required |
-| `MONGODB_URI` | MongoDB connection string | `mongodb://localhost:27017/discord-messages` |
-| `SERVER_PORT` | Application port | `8080` |
+| `MONGODB_USERNAME` | MongoDB admin username | `admin` |
+| `MONGODB_PASSWORD` | MongoDB admin password | `password123` |
+| `MONGODB_DATABASE` | MongoDB database name | `discord-messages` |
+| `MONGODB_PORT` | MongoDB port | `27017` |
+| `APP_PORT` | Application port | `8080` |
+| `SPRING_PROFILES_ACTIVE` | Spring active profiles | `docker` |
 | `JAVA_OPTS` | JVM options | `-Xmx512m -Xms256m` |
+| `MONGO_EXPRESS_PORT` | Mongo Express port | `8081` |
+| `MONGO_EXPRESS_USER` | Mongo Express username | `admin` |
+| `MONGO_EXPRESS_PASSWORD` | Mongo Express password | `admin123` |
 
 ## Architecture
 
@@ -312,6 +363,9 @@ If you encounter any issues or have questions:
 2. Search existing [GitHub issues](issues)
 3. Create a new issue with detailed information
 
-## Changelog
+---
+**⭐ If you find Discord Message Logger helpful, please star this repository to support the project!**
 
-See [CHANGELOG.md](CHANGELOG.md) for a list of changes and version history.
+<div align="center">
+  Made with ❤️ by developers, for developers
+</div>

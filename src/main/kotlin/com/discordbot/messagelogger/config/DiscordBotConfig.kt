@@ -2,6 +2,7 @@ package com.discordbot.messagelogger.config
 
 import com.discordbot.messagelogger.listener.MessageListener
 import com.discordbot.messagelogger.service.CommandHandlerService
+import jakarta.annotation.PreDestroy
 import net.dv8tion.jda.api.JDA
 import net.dv8tion.jda.api.JDABuilder
 import net.dv8tion.jda.api.interactions.commands.OptionType
@@ -11,7 +12,6 @@ import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
-import javax.annotation.PreDestroy
 
 @Configuration
 class DiscordBotConfig(
@@ -31,6 +31,7 @@ class DiscordBotConfig(
         jda = JDABuilder.createDefault(botToken)
             .enableIntents(
                 GatewayIntent.GUILD_MESSAGES,
+                GatewayIntent.GUILD_MEMBERS,
                 GatewayIntent.MESSAGE_CONTENT,
                 GatewayIntent.DIRECT_MESSAGES
             )

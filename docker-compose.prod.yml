@@ -1,5 +1,3 @@
-version: '3.8'
-
 secrets:
   discord_bot_token:
     file: ./secrets/discord_bot_token.txt
@@ -11,7 +9,7 @@ secrets:
 services:
   # MongoDB database
   mongodb:
-    image: mongo:6.0-jammy
+    image: mongo:7-jammy
     container_name: discord-logger-mongodb-prod
     restart: unless-stopped
     ports:

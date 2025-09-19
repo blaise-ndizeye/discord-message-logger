@@ -108,11 +108,11 @@ class MessageLoggerService(
             messageId = jdaMessage.id,
             channelId = jdaMessage.channel.id,
             channelName = jdaMessage.channel.name,
-            guildId = jdaMessage.guild?.id,
-            guildName = jdaMessage.guild?.name,
+            guildId = jdaMessage.guild.id,
+            guildName = jdaMessage.guild.name,
             authorId = jdaMessage.author.id,
             authorName = jdaMessage.author.name,
-            authorDiscriminator = jdaMessage.author.discriminator,
+            authorDisplayName = jdaMessage.member?.effectiveName ?: jdaMessage.author.name,
             content = jdaMessage.contentRaw,
             timestamp = jdaMessage.timeCreated.atZoneSameInstant(ZoneId.systemDefault()).toLocalDateTime(),
             editedTimestamp = jdaMessage.timeEdited?.atZoneSameInstant(ZoneId.systemDefault())?.toLocalDateTime(),
@@ -131,7 +131,7 @@ class MessageLoggerService(
                 filename = attachment.fileName,
                 url = attachment.url,
                 proxyUrl = attachment.proxyUrl,
-                size = attachment.size,
+                size = attachment.size.toLong(),
                 contentType = attachment.contentType
             )
         }

@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<FindBugsFilter>
+    <!-- Exclude test classes from certain checks -->
+    <Match>
+        <Class name="~.*Test.*"/>
+        <Bug pattern="DMI_HARDCODED_ABSOLUTE_FILENAME"/>
+    </Match>
+    
+    <!-- Exclude Spring Boot generated classes -->
+    <Match>
+        <Class name="~.*Application"/>
+        <Bug pattern="UWF_FIELD_NOT_INITIALIZED_IN_CONSTRUCTOR"/>
+    </Match>
+    
+    <!-- Exclude Kotlin data classes from certain checks -->
+    <Match>
+        <Class name="~.*\$Companion"/>
+        <Bug pattern="SE_NO_SERIALVERSIONID"/>
+    </Match>
+    
+    <!-- Exclude MongoDB entities from serialization warnings -->
+    <Match>
+        <Class name="com.discordbot.messagelogger.model.DiscordMessage"/>
+        <Bug pattern="SE_NO_SERIALVERSIONID"/>
+    </Match>
+    
+    <Match>
+        <Class name="com.discordbot.messagelogger.model.MessageAttachment"/>
+        <Bug pattern="SE_NO_SERIALVERSIONID"/>
+    </Match>
+    
+    <Match>
+        <Class name="com.discordbot.messagelogger.model.MessageEmbed"/>
+        <Bug pattern="SE_NO_SERIALVERSIONID"/>
+    </Match>
+    
+    <!-- Exclude JDA event handlers from certain checks -->
+    <Match>
+        <Class name="com.discordbot.messagelogger.listener.MessageListener"/>
+        <Bug pattern="UWF_UNWRITTEN_FIELD"/>
+    </Match>
+    
+    <!-- Allow unused parameters in override methods -->
+    <Match>
+        <Method name="~on.*Event"/>
+        <Bug pattern="UP_UNUSED_PARAMETER"/>
+    </Match>
+    
+    <!-- Spring dependency injection fields -->
+    <Match>
+        <Bug pattern="UWF_UNWRITTEN_FIELD"/>
+        <Field name="~.*Service$"/>
+    </Match>
+    
+    <Match>
+        <Bug pattern="UWF_UNWRITTEN_FIELD"/>
+        <Field name="~.*Repository$"/>
+    </Match>
+</FindBugsFilter>

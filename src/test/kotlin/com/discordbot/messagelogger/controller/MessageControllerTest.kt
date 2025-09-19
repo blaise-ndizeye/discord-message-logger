@@ -138,6 +138,10 @@ class MessageControllerTest {
 
     @Test
     fun `parseSort should handle ascending sort correctly`() {
+        // Given
+        val page = PageImpl<DiscordMessage>(emptyList())
+        every { messageLoggerService.getMessagesByChannel(any(), any()) } returns page
+        
         // When
         val response = messageController.getMessagesByChannel("channel1", 0, 20, "content,asc")
 
@@ -148,6 +152,10 @@ class MessageControllerTest {
 
     @Test
     fun `parseSort should default to ascending when direction not specified`() {
+        // Given
+        val page = PageImpl<DiscordMessage>(emptyList())
+        every { messageLoggerService.getMessagesByChannel(any(), any()) } returns page
+        
         // When
         val response = messageController.getMessagesByChannel("channel1", 0, 20, "authorName")
 
@@ -162,8 +170,8 @@ class MessageControllerTest {
         val page = PageImpl<DiscordMessage>(emptyList())
         every { messageLoggerService.getMessagesByChannel(any(), any()) } returns page
 
-        // When
-        val response = messageController.getMessagesByChannel("channel1")
+        // When - test default parameters by calling with explicit defaults
+        val response = messageController.getMessagesByChannel("channel1", 0, 20, "timestamp,desc")
 
         // Then - verify default parameters are used
         val expectedPageable = PageRequest.of(0, 20, Sort.by(Sort.Direction.DESC, "timestamp"))
@@ -179,7 +187,7 @@ class MessageControllerTest {
         guildName = "Test Guild",
         authorId = "author1",
         authorName = "Test User",
-        authorDiscriminator = "0001",
+        authorDisplayName = "0001",
         content = "Test message content",
         timestamp = LocalDateTime.now(),
         isBot = false

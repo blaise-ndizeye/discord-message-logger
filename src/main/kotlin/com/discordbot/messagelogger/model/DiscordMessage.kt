@@ -8,7 +8,7 @@ import java.time.LocalDateTime
 data class DiscordMessage(
     @Id
     val id: String? = null,
-    
+
     val messageId: String,
     val channelId: String,
     val channelName: String,
@@ -16,7 +16,7 @@ data class DiscordMessage(
     val guildName: String?,
     val authorId: String,
     val authorName: String,
-    val authorDiscriminator: String,
+    val authorDisplayName: String,
     val content: String,
     val timestamp: LocalDateTime,
     val editedTimestamp: LocalDateTime? = null,

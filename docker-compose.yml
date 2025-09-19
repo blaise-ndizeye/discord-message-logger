@@ -1,9 +1,7 @@
-version: '3.8'
-
 services:
   # MongoDB database
   mongodb:
-    image: mongo:6.0-jammy  # MongoDB doesn't have official Alpine image, using lighter jammy version
+    image: mongo:7-jammy
     container_name: discord-logger-mongodb
     restart: unless-stopped
     ports:
@@ -35,9 +33,14 @@ services:
       - "${APP_PORT:-8080}:8080"
     environment:
       - DISCORD_BOT_TOKEN=${DISCORD_BOT_TOKEN}
-      - MONGODB_URI=mongodb://${MONGODB_USERNAME:-admin}:${MONGODB_PASSWORD:-password123}@mongodb:27017/${MONGODB_DATABASE:-discord-messages}?authSource=admin
+      - SPRING_DATA_MONGODB_HOST=mongodb
+      - SPRING_DATA_MONGODB_PORT=27017
+      - SPRING_DATA_MONGODB_DATABASE=${MONGODB_DATABASE:-discord-messages}
+      - SPRING_DATA_MONGODB_USERNAME=${MONGODB_USERNAME:-admin}
+      - SPRING_DATA_MONGODB_PASSWORD=${MONGODB_PASSWORD:-password123}
+      - SPRING_DATA_MONGODB_AUTHENTICATION_DATABASE=admin
       - SERVER_PORT=8080
-      - SPRING_PROFILES_ACTIVE=${SPRING_PROFILES:-docker}
+      - SPRING_PROFILES_ACTIVE=${SPRING_PROFILES_ACTIVE:-docker}
       - JAVA_OPTS=${JAVA_OPTS:--Xmx512m -Xms256m}
     depends_on:
       mongodb:
