@@ -57,7 +57,7 @@ logs/
 *.sqlite
 
 # Docker
-.dockerignore
+# .dockerignore should be committed to ensure consistent Docker builds
 
 # OS
 .DS_Store
